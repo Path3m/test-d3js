@@ -1,0 +1,11 @@
+/* Styles for container */
+.container {
+    width: 10px; /* Adjust as needed */
+    /*max-width: 1200px; /* Adjust as needed */
+    margin: 2 auto; /* Center the container horizontally */
+    padding: 20px; /* Adjust padding as needed */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    /* Add more styles as needed */
+    color: green
+  }
+  
