@@ -1,4 +1,4 @@
 # ignore npm installation or run file
-/.parcel-cache
-/dist
-/nodes_modules
+.parcel-cache/
+dist/
+node_modules/
