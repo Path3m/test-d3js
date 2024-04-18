@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch firefox",
+            "request": "launch",
+            "type": "firefox",
+            "reAttach": true,
+            "file": "${workspaceFolder}/steamgraph_example.html"
+        },
+        {
             "name": "Launch chrome",
             "request": "launch",
             "type": "chrome",
@@ -17,7 +24,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\function_test.js"
+            "program": "${workspaceFolder}/package-func-test/function_test.js"
         }
     ]
 }

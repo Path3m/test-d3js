@@ -1,6 +1,7 @@
 /* Styles for container */
 .container {
     width: 10px; /* Adjust as needed */
+    height: 100px;
     /*max-width: 1200px; /* Adjust as needed */
     margin: 2 auto; /* Center the container horizontally */
     padding: 20px; /* Adjust padding as needed */
