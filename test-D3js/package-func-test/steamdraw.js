@@ -1,13 +1,15 @@
+import * as d3 from "d3";
+
 export class Steamgraph {
 
     constructor(divID){
-        this.svg = this.initSVG(divID);
+        this.svg = "noSVG";
         this.divID = divID;
 
         // set the dimensions and margins of the graph
         this.margin = {top: 20, right: 30, bottom: 30, left: 60};
-        this.width = 1200 - margin.left - margin.right;
-        this.height = 700 - margin.top - margin.bottom;
+        this.width = 1200 - this.margin.left - this.margin.right;
+        this.height = 700 - this.margin.top - this.margin.bottom;
     }
 
     //-------------------------------------------------------------------
@@ -20,15 +22,13 @@ export class Steamgraph {
         //TODO : implement a function that uses a css container to init the svg object ?    
     
         // append the svg object to the body of the page
-        var svg = d3.select("#"+divID)
+        this.svg = d3.select("#"+divID)
         .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
+          .attr("width", this.width + this.margin.left + this.margin.right)
+          .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
           .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
-    
-        return svg;
+              "translate(" + this.margin.left + "," + this.margin.top + ")");
     }
 
     //-------------------------------------------------------------------
@@ -41,7 +41,7 @@ export class Steamgraph {
     createAxeX(data, scaleX){
         return d3.scaleLinear()
           .domain(d3.extent(data, function(d) { return d[scaleX]; }))
-          .range([ 0, width ]);
+          .range([ 0, this.width ]);
     }
 
     //-------------------------------------------------------------------
@@ -63,7 +63,7 @@ export class Steamgraph {
       
         return d3.scaleLinear()
           .domain(rangeY)
-          .range([ height, 0 ]);
+          .range([ this.height, 0 ]);
     }
 
     //-------------------------------------------------------------------
@@ -80,13 +80,13 @@ export class Steamgraph {
       
         // Add X axis
         var x = createAxeX(data, Xscale);
-        svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
+        this.svg.append("g")
+          .attr("transform", "translate(0," + this.height + ")")
           .call(d3.axisBottom(x).ticks(5));
       
         // Add Y axis
         var y = createAxeY(data, keys);
-        svg.append("g")
+        this.svg.append("g")
           .call(d3.axisLeft(y));
       
         // color palette

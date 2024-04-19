@@ -45,8 +45,8 @@ import { Steamgraph } from "./steamdraw.js";
 //-----------------------------------------------------------
 //READING FROM A LOCAL CSV FILE
 
-var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
-var fileName = "http://localhost:8000/CSV-data-file/datatest.csv";
+//var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
+//var fileName = "http://localhost:8000/CSV-data-file/datatest.csv";
 
 const csv = fs.readFileSync("CSV-data-file/datatest.csv", "utf8");
 const data = d3.csvParse(csv);
@@ -56,5 +56,15 @@ var keys = getKeys(data);
 keys.forEach( current => {
     console.log(data[current]);
 });
+
+
+//-----------------------------------------------------------
+//Testing steamgraph class
+var div = "steamgraph";
+var mygraph = new Steamgraph(div);
+
+console.log(mygraph);
+
+//mygraph.drawgraph("CSV-data-test/datatest.csv");
 
 console.log("fin de programme");

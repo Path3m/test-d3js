@@ -5,14 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch firefox",
+            "name": "Launch steamgraph from local",
             "request": "launch",
-            "type": "firefox",
-            "reAttach": true,
-            "file": "${workspaceFolder}/steamgraph_example.html"
+            "type": "chrome",
+            "file": "${workspaceFolder}/package-func-test/index.html"
         },
         {
-            "name": "Launch chrome",
+            "name": "Launch steamgraph from url",
             "request": "launch",
             "type": "chrome",
             "file": "${workspaceFolder}/steamgraph_example.html"

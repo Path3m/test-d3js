@@ -25,12 +25,24 @@ function initSVG(divID) {
 var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
 var fileName = "http://localhost:8000/CSV-data-file/datatest.csv";
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} scaleX 
+ * @returns 
+ */
 function createAxeX(data, scaleX){
   return d3.scaleLinear()
     .domain(d3.extent(data, function(d) { return d[scaleX]; }))
     .range([ 0, width ]);
 }
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} categorieKey 
+ * @returns 
+ */
 function createAxeY(data, categorieKey){
   let Ywidth = d3.extent(data, function(d) {
     let sum = 0;
@@ -46,6 +58,11 @@ function createAxeY(data, categorieKey){
     .range([ height, 0 ]);
 }
 
+/**
+ * 
+ * @param {*} colors 
+ * @param {*} data 
+ */
 function addDataToGraph(colors, data) {
 
   // List of groups = header of the csv files
@@ -89,6 +106,11 @@ function addDataToGraph(colors, data) {
 
 }
 
+/**
+ * 
+ * @param {*} csvLink 
+ * @returns 
+ */
 function drawgraph(csvLink){
 
   //TODO : here, we can read the csv file to determine the contrast need ?
