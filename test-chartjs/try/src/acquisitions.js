@@ -1,5 +1,23 @@
 import Chart from 'chart.js/auto'
 
+//////////////////////////////////////////////////////////////////
+/* CONFIG FOR A BAR DIAGRAM */
+const cfg = {
+  type: 'bar',
+  data: {
+    datasets: [{
+      data: [{id: 'Sales', nested: {value: 1500}}, {id: 'Purchases', nested: {value: 500}}]
+    }]
+  },
+  options: {
+    parsing: {
+      xAxisKey: 'id',
+      yAxisKey: 'nested.value'
+    }
+  }
+}
+
+//---------------------------------------------
 const dataBar = [
   { year: 2010, count: 10 },
   { year: 2011, count: 20 },
@@ -23,6 +41,8 @@ const cfgBar = {
   }
 }
 
+//////////////////////////////////////////////////////////
+/*CONFIG FOR A CIRCULAR DIAGRAM */
 const dataCheese = [
   {id: 'Sales', nested: {value: 1500}}, 
   {id: 'Purchases', nested: {value: 500}}
@@ -42,21 +62,10 @@ const cfgCheese = {
   }
 }
 
-const cfg = {
-  type: 'bar',
-  data: {
-    datasets: [{
-      data: [{id: 'Sales', nested: {value: 1500}}, {id: 'Purchases', nested: {value: 500}}]
-    }]
-  },
-  options: {
-    parsing: {
-      xAxisKey: 'id',
-      yAxisKey: 'nested.value'
-    }
-  }
-}
+//////////////////////////////////////////////////////////
+/*CONFIG FOR An AREA DIAGRAM */
 
+//this one currently doesn't work
 const dataArea = [
   {fill: 'origin'},      // 0: fill to 'origin'
   {fill: '+2'},          // 1: fill to dataset 3
@@ -70,7 +79,10 @@ const cfgArea = {
   data: dataArea
 };
 
-
+//----------------------------------------------------
+/*CONFIG FOR an area diagram build with line
+ currently doesn't work
+*/
 const dataLine = {
   labels: ['j','f','m','a','m','j','j'],
   datasets: [
@@ -105,7 +117,8 @@ const configLine = {
   data: dataLine,
 };
 
-
+////////////////////////////////////////////////////////
+/* DRAWING THE DIFFERENT GRAPH */
 async function drawgraph(canva, config) {
   new Chart(
     document.getElementById(canva),
@@ -113,5 +126,7 @@ async function drawgraph(canva, config) {
   );
 }
 
-
-drawgraph('othergraph', configLine);
+drawgraph('graph', configLine);
+drawgraph('graph2', cfgCheese);
+drawgraph('graph3', cfgBar);
+drawgraph('graph4', cfg);
