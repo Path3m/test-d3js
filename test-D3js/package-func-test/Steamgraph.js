@@ -1,28 +1,25 @@
-import * as d3 from "d3";
-
 export class Steamgraph {
 
     constructor(divID){
-        this.svg = "noSVG";
-        this.divID = divID;
-
         // set the dimensions and margins of the graph
         this.margin = {top: 20, right: 30, bottom: 30, left: 60};
         this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 700 - this.margin.top - this.margin.bottom;
+
+        this.svg = this.initSVG(divID);
+        this.divID = divID;
     }
 
     //-------------------------------------------------------------------
     /**
-     * Initialize an svg
+     * Initialize the string containing an svg object informations
      * @param {*} divID the div in the html page
-     * @returns an svg object
      */
     initSVG(divID) {
         //TODO : implement a function that uses a css container to init the svg object ?    
     
         // append the svg object to the body of the page
-        this.svg = d3.select("#"+divID)
+        return d3.select(divID)
         .append("svg")
           .attr("width", this.width + this.margin.left + this.margin.right)
           .attr("height", this.height + this.margin.top + this.margin.bottom)
@@ -33,7 +30,7 @@ export class Steamgraph {
 
     //-------------------------------------------------------------------
     /**
-     * 
+     * Create and append to the svg object the x axis
      * @param {*} data 
      * @param {*} scaleX 
      * @returns 
@@ -46,7 +43,7 @@ export class Steamgraph {
 
     //-------------------------------------------------------------------
     /**
-     * 
+     * Create and append to the svg object the y axis
      * @param {*} data 
      * @param {*} categorieKey 
      * @returns 
@@ -74,45 +71,45 @@ export class Steamgraph {
      */
     addDataToGraph(colors, data) {
 
-        // List of groups = header of the csv files
-        var keys = data.columns.slice(1);
-        var Xscale = (data.columns)[0]; //scale of the x axe
-      
-        // Add X axis
-        var x = createAxeX(data, Xscale);
-        this.svg.append("g")
-          .attr("transform", "translate(0," + this.height + ")")
-          .call(d3.axisBottom(x).ticks(5));
-      
-        // Add Y axis
-        var y = createAxeY(data, keys);
-        this.svg.append("g")
-          .call(d3.axisLeft(y));
-      
-        // color palette
-        var color = d3.scaleOrdinal()
-          .domain(keys)
-          .range(colors)
-      
-        //stack the data?
-        var stackedData = d3.stack()
-          .offset(d3.stackOffsetSilhouette)
-          .keys(keys)
-          (data)
-      
-        // Show the areas
-        svg
-          .selectAll("mylayers")
-          .data(stackedData)
-          .enter()
-          .append("path")
-            .style("fill", function(d) { return color(d.key); })
-            .attr("d", d3.area()
-              .x(function(d, i) { return x(d.data[Xscale]); })
-              .y0(function(d) { return y(d[0]); })
-              .y1(function(d) { return y(d[1]); })
-          )
-      
+      // List of groups = header of the csv files
+      var keys = data.columns.slice(1);
+      var Xscale = (data.columns)[0]; //scale of the x axe
+    
+      // Add X axis
+      var x = this.createAxeX(data, Xscale);
+      this.svg.append("g")
+        .attr("transform", "translate(0," + this.height + ")")
+        .call(d3.axisBottom(x).ticks(5));
+    
+      // Add Y axis
+      var y = this.createAxeY(data, keys);
+      this.svg.append("g")
+        .call(d3.axisLeft(y));
+    
+      // color palette
+      var color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(colors)
+    
+      //stack the data?
+      var stackedData = d3.stack()
+        .offset(d3.stackOffsetSilhouette)
+        .keys(keys)
+        (data)
+    
+      // Show the areas
+      this.svg
+        .selectAll("mylayers")
+        .data(stackedData)
+        .enter()
+        .append("path")
+          .style("fill", function(d) { return color(d.key); })
+          .attr("d", d3.area()
+            .x(function(d, i) { return x(d.data[Xscale]); })
+            .y0(function(d) { return y(d[0]); })
+            .y1(function(d) { return y(d[1]); })
+        )
+    
     }
 
     //-------------------------------------------------------------------
@@ -120,25 +117,11 @@ export class Steamgraph {
      * 
      * @param {*} file
      */
-    drawgraph(file){
+    drawgraph(colors, csvString){
 
         //TODO : here, we can read the csv file to determine the contrast need ?
-  
-        var colors = [
-          'rgb(255,0,0)',
-          'rgb(255,0,255)',
-          'rgb(255,255,0)',
-          'rgb(255,255,255)',
-          'rgb(0,0,0)',
-          'rgb(0,0,255)',
-          'rgb(0,255,0)',
-          'rgb(0,255,255)'
-        ];
-  
-        var csv = fs.readFileSync(file);
-        var data = d3.csvParse(csv);
-
-        data.forEach(current => this.addDataToGraph(colors, current));
+        var data = d3.csvParse(csvString);
+        this.addDataToGraph(colors, data);
     }
 
 }

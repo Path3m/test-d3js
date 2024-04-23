@@ -85,6 +85,7 @@ function addDataToGraph(colors, data) {
     .domain(keys)
     .range(colors)
 
+  console.log(data)
   //stack the data?
   var stackedData = d3.stack()
     .offset(d3.stackOffsetSilhouette)
@@ -107,7 +108,7 @@ function addDataToGraph(colors, data) {
 }
 
 /**
- * 
+ * Draw a graph from a csv link
  * @param {*} csvLink 
  * @returns 
  */
@@ -129,6 +130,26 @@ function drawgraph(csvLink){
   return d3.csv(csvLink, function(data){ addDataToGraph(colors, data); });
 }
 
-var mygraph = drawgraph(site);
+//--------------------------------
+/* TESTING THE MAIN FUNCTIONNALITY */
 
-d3.csv(fileName, function(d){console.log(d);});
+var str = (
+  "jour, pop, rock, electro\n"+
+  "1,1,1,1\n"+
+  "2,0,2,2\n"+
+  "3,2,1,7\n"+
+  "4,3,4,5\n"
+);
+
+console.log(str);
+
+var dataStr = d3.csvParse(str);
+
+console.log(dataStr);
+
+var colors = [
+  'rgb(255,0,0)',
+  'rgb(255,0,255)',
+  'rgb(255,255,0)'
+];
+addDataToGraph(colors, dataStr);

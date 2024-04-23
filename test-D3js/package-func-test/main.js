@@ -1,8 +1,10 @@
-import * as d3 from "d3";
-import * as fs from "fs";
+/* import * as fs from "fs"; */
 import {maxLineSum, getKeys, rangeKeyValue} from "./test-sum-object.js";
-import { Steamgraph } from "./steamdraw.js";
+import { Steamgraph } from "./Steamgraph.js";
+import * as jeu from "./data.js";
 
+var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
+var othersite = "http://localhost:8000/package-func-test/datatest.csv"
 //-----------------------------------------------------------
 //TESTING Test-sum-object function
 
@@ -45,25 +47,37 @@ import { Steamgraph } from "./steamdraw.js";
 //-----------------------------------------------------------
 //READING FROM A LOCAL CSV FILE
 
-//var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
-//var fileName = "http://localhost:8000/CSV-data-file/datatest.csv";
-
-const csv = fs.readFileSync("CSV-data-file/datatest.csv", "utf8");
-const data = d3.csvParse(csv);
-console.log(data);
-
-var keys = getKeys(data);
-keys.forEach( current => {
-    console.log(data[current]);
-});
+//const csv = fs.readFileSync(csv, "utf8");
+//const data = d3.csvParse(csv);
+//console.log(data);
+//
+//var keys = getKeys(data);
+//keys.forEach( current => {
+//    console.log(data[current]);
+//});
 
 
 //-----------------------------------------------------------
 //Testing steamgraph class
-var div = "steamgraph";
-var mygraph = new Steamgraph(div);
 
-console.log(mygraph);
+console.log("Testing Steamgraph class");
+var dayMusique = new Steamgraph("#steamgraph1");
+var usaNames = new Steamgraph("#steamgraph2");
+
+var colors = [
+    'rgb(255,0,0)',
+    'rgb(255,0,255)',
+    'rgb(255,255,0)',
+    'rgb(255,255,255)',
+    'rgb(0,0,0)',
+    'rgb(0,0,255)',
+    'rgb(0,255,0)',
+    'rgb(0,255,255)'
+];
+
+dayMusique.drawgraph(colors, jeu.dayMusique);
+usaNames.drawgraph(colors, jeu.usaNames);
+
 
 //mygraph.drawgraph("CSV-data-test/datatest.csv");
 

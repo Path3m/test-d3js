@@ -23,7 +23,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/package-func-test/function_test.js"
+            "program": "${workspaceFolder}/package-func-test/main.js"
         }
     ]
 }
