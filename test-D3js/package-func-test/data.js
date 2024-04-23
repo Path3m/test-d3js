@@ -3,7 +3,7 @@ export const dayMusique = (
   "1,1,1,1\n"+
   "2,1,0,2\n"+
   "3,1,1,3\n"+
-  "4,1,0,4\n"
+  "4,1,0,1\n"
 );
 
 export const usaNames = (

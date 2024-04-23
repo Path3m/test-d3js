@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch steamgraph from local",
+            "name": "Launch streamgraph from local",
             "request": "launch",
             "type": "chrome",
             "file": "${workspaceFolder}/package-func-test/index.html"
         },
         {
-            "name": "Launch steamgraph from url",
+            "name": "Launch streamgraph from url",
             "request": "launch",
             "type": "chrome",
-            "file": "${workspaceFolder}/steamgraph_example.html"
+            "file": "${workspaceFolder}/streamgraph_example.html"
         },
         {
             "type": "node",
