@@ -1,6 +1,6 @@
-import { getKeys } from "./test-sum-object.js";
+import * as util from "./utilitaire.js";
 
-export class Steamgraph {
+export class Streamgraph {
 
     constructor(divID, data){
         // set the dimensions and margins of the graph
@@ -113,59 +113,66 @@ export class Steamgraph {
     }
 
     //---------------------------------------------------------------
-    computeImportanceMatrix(){
-      var keys = getKeys(this.data[0]).slice(1);
-      var H = this.data;
+    /**
+     * GIVEN THE D3 REPRESNETATION OF A STEAMGRAPH
+     *  - compute the importance matrix of the streamgraph
+     * @param {string} library the library used to draw the graph
+     * @returns the importance matrix of a streamgraph
+     */
+    computeImportanceMatrix(library){
 
-      var importance = new Array(keys.length);
-      for(let i = 0; i < importance.length; i++){ importance[i] = new Array(keys.length); }
+      //TODO : use library to determine which representation is in used and compute the matrix accordingly
 
-      for(let t = 0; t < H.length; t++){ //parcours de l'echelle de temps
+      var keys = util.getKeys(this.data[0]).slice(1);
+      var hauteur = this.data;
+      var importance = util.nullMatrix(keys.length, keys.length, Float32Array);
 
-        var idxCategorie = 0;
-        var idxVoisin    = 1;
+      for(let t = 0; t < hauteur.length; t++){ //parcours de l'echelle de temps
 
-        while (idxCategorie < importance.length && idxVoisin < importance.length){
+        var categorie = 0;
+        var voisin    = 1;
 
-          if(idxCategorie == idxVoisin){ //importance symétrique, on ne la calcule que pour un couple categorie, voisin
+        while (categorie < importance.length && voisin < importance.length){
+          //besoin de de contratste ssi la hauteur des deux catégories n'est pas nulle, et les catégories sont différentes
 
-            importance[idxCategorie][idxVoisin] = 0;
-            idxVoisin++; 
+          if      (categorie == voisin || hauteur[t][keys[voisin]] == 0){ voisin++;    }
+          else if (hauteur[t][keys[categorie]] == 0)                    { categorie++; }
 
-          }else if(H[t][keys[idxCategorie]] == 0){ //la catégorie est à zéro, pas de besoin de contraste
+          else{ //sinon, il y a besoin de contraste entre les catégories
+            var importancePrecedente = importance[categorie][voisin];
+            var hauteurCategorie     = hauteur[t][keys[categorie]];
+            var hauteurVoisin        = hauteur[t][keys[voisin]];
 
-            importance[idxCategorie][idxVoisin] = 0;
-            idxCategorie++;
-
-          }else if(H[t][keys[idxVoisin]] == 0){ //le voisin est à zero, on cherche le voisin suivant
-
-            importance[idxCategorie][idxVoisin] = 0;
-            idxVoisin++;
-          
-          }else{ //sinon, il y a besoin de contraste entre les catégories
-
-            var importancePrecedente = (isNaN(importance[idxCategorie][idxVoisin])) ? -1 : importance[idxCategorie][idxVoisin];
-            var hauteurCategorie = H[t][keys[idxCategorie]];
-            var hauteurVoisin    = H[t][keys[idxVoisin]];
-
-            importance[idxCategorie][idxVoisin] = Math.max(importancePrecedente, 1/hauteurCategorie, 1/hauteurVoisin);
-            idxCategorie++; idxVoisin++;
+            importance[categorie][voisin] = Math.max(importancePrecedente, 1/hauteurCategorie, 1/hauteurVoisin);
+            categorie++; voisin++;
           }
-          
         }
       }
 
       //matrice symétrique
-      for(var ligne = 0; ligne < importance.length; ligne++){
-        for(var colonne = 0; colonne <= ligne; colonne++){
-          if(ligne == colonne){
-            importance[ligne][colonne] = 0;
-          }else{
-            importance[ligne][colonne] = importance[colonne][ligne];
-          }
+      return util.symetryMatrix(importance, "", 0);
+    }
+
+    //---------------------------------------------------------------------
+    /**
+     * @return the data needed to print the importance matrix as a HeatMap
+     */
+    heatMapData(){
+      var importance = this.computeImportanceMatrix("");
+      var categories = util.getKeys(this.data[0]).slice(1);
+
+      var dataHeatMap = new Array(importance.length**2);
+
+      for(let i=0; i < importance.length; i++){
+        for(let j=0; j < importance.length; j++){
+          dataHeatMap[i * importance.length + j] = { 
+            x: categories[i], 
+            y: categories[j], 
+            heat: 1000*importance[i][j]
+          };
         }
       }
 
-      return importance;
+      return dataHeatMap;
     }
 }
