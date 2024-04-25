@@ -8,7 +8,9 @@ export class Streamgraph {
         this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 700 - this.margin.top - this.margin.bottom;
 
-        this.data = data;
+        this.data = (data instanceof String || typeof data === 'string') ? 
+          d3.csvParse(data) : 
+          data;
 
         this.svg = this.initSVG(divID);
         this.divID = divID;
@@ -144,13 +146,15 @@ export class Streamgraph {
             var hauteurVoisin        = hauteur[t][keys[voisin]];
 
             importance[categorie][voisin] = Math.max(importancePrecedente, 1/hauteurCategorie, 1/hauteurVoisin);
+            
+            //matrice symmétrique
+            importance[voisin][categorie] = importance[categorie][voisin];
             categorie++; voisin++;
           }
         }
       }
 
-      //matrice symétrique
-      return util.symetryMatrix(importance, "", 0);
+      return importance;
     }
 
     //---------------------------------------------------------------------
@@ -168,7 +172,7 @@ export class Streamgraph {
           dataHeatMap[i * importance.length + j] = { 
             x: categories[i], 
             y: categories[j], 
-            heat: 1000*importance[i][j]
+            heat: importance[i][j]
           };
         }
       }

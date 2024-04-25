@@ -10,15 +10,7 @@ var othersite = "http://localhost:8000/package-func-test/datatest.csv"
 //-----------------------------------------------------------
 //Testing steamgraph class
 
-console.log("Testing Streamgraph class");
-
-var dataMusic = d3.csvParse(jeu.dayMusique);
-var dataUSName = d3.csvParse(jeu.usaNames);
-
-var graphDayMusique = new Streamgraph("#streamgraph1", dataMusic);
-var graphUsaNames = new Streamgraph("#streamgraph2", dataUSName);
-
-console.log(graphUsaNames.computeImportanceMatrix(""));
+console.log("Testing");
 
 var colors = [
     'rgb(255,0,0)',
@@ -31,15 +23,18 @@ var colors = [
     'rgb(200,200,200)'
 ];
 
-//dayMusique.draw(colors);
-//usaNames.draw(colors);
+var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dayMusique);
+var graphUsaNames = new Streamgraph("#streamgraph2", jeu.usaNames);
 
-var heatMapMusic = new ImportanceHeatMap("Matrice Importance Musique", graphDayMusique);
-var heatMapNames = anychart.heatMap(graphUsaNames.heatMapData());
-heatMapNames.container("heatmap2").draw();
+graphDayMusique.draw(colors);
+graphUsaNames.draw(colors);
 
+console.log(graphUsaNames.computeImportanceMatrix(""));
 
-heatMapMusic.draw("heatmap1");
-/* heatMapNames.draw("heatmap2"); */
+var heatMapMusic = new ImportanceHeatMap(graphDayMusique, "Matrice Importance Musique", "heatmap1");
+heatMapMusic.draw();
+
+var heatMapNames = new ImportanceHeatMap(graphUsaNames, "Matrice Importance Noms", "heatmap2");
+heatMapNames.draw();
 
 console.log("fin de programme");
