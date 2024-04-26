@@ -121,7 +121,7 @@ export class Streamgraph {
      * @param {string} library the library used to draw the graph
      * @returns the importance matrix of a streamgraph
      */
-    computeImportanceMatrix(library){
+    computeImportanceMatrix(func){
 
       //TODO : use library to determine which representation is in used and compute the matrix accordingly
 
@@ -145,7 +145,7 @@ export class Streamgraph {
             var hauteurCategorie     = hauteur[t][keys[categorie]];
             var hauteurVoisin        = hauteur[t][keys[voisin]];
 
-            importance[categorie][voisin] = Math.max(importancePrecedente, 1/hauteurCategorie, 1/hauteurVoisin);
+            importance[categorie][voisin] = func(importancePrecedente, hauteurCategorie, hauteurVoisin);
             
             //matrice symmétrique
             importance[voisin][categorie] = importance[categorie][voisin];
@@ -161,8 +161,8 @@ export class Streamgraph {
     /**
      * @return the data needed to print the importance matrix as a HeatMap
      */
-    heatMapData(){
-      var importance = this.computeImportanceMatrix("");
+    heatMapData(func){
+      var importance = this.computeImportanceMatrix(func);
       var categories = util.getKeys(this.data[0]).slice(1);
 
       var dataHeatMap = new Array(importance.length**2);

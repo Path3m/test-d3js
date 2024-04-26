@@ -5,17 +5,17 @@ export class ImportanceHeatMap{
     /**
      * Constructor
      * @param {*} graph the data vizualisation from which we get the importance matrix
+     * @param {function} func the function over which the importance will be computed
      * @param {*} title 
      * @param {*} container an html container to display on the page
      */
-    constructor(graph, title, container){
-        this.data = graph.heatMapData();
+    constructor(graph, func, title, container){
+
+        this.data = graph.heatMapData(func);
 
         this.heatmap = anychart.heatMap(this.data);
         this.heatmap.container(container);
-        this.heatmap.title(title);
-
-        console.log(this.data);
+        this.heatmap.title("Matrice d'Importance des besoins de contraste \n"+title);
     }
 
     /**
