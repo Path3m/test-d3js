@@ -118,7 +118,6 @@ export class Streamgraph {
     /**
      * GIVEN THE D3 REPRESNETATION OF A STEAMGRAPH
      *  - compute the importance matrix of the streamgraph
-     * @param {string} library the library used to draw the graph
      * @returns the importance matrix of a streamgraph
      */
     computeImportanceMatrix(func){

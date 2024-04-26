@@ -52,13 +52,7 @@ export class ImportanceHeatMap{
      * Draw the heatmap
      */
     draw(){
-        let colors = [
-            "rgb(250, 250, 250)", //white
-            "rgb(0, 255, 255)",   //cyan
-            "rgb(255, 255, 0)",   //yellow
-            "rgb(255, 165, 250)", //orange
-            "rgb(255, 0, 0)"      //red
-        ];
+        const colors = d3.schemeReds[9].slice();
 
         this.setColorScale(colors);
         this.heatmap.draw();

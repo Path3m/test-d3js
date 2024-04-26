@@ -19,16 +19,18 @@ console.log("Testing");
 function maxInverse(x,y,z){ return Math.max(x, 1/y, 1/z); }
 function sumInverse(x,y,z){ return x + 1/y + 1/z; }
 
-var colors = [
-    'rgb(255,0,0)',
-    'rgb(255,0,255)',
-    'rgb(255,255,0)',
-    'rgb(100,100,100)',
-    'rgb(0,0,255)',
-    'rgb(0,255,0)',
-    'rgb(0,255,255)',
-    'rgb(200,200,200)'
-];
+function shuffle(array){
+    let newarray = array.slice();
+    return  Array.from(newarray.sort((a,b) => 0.5 - Math.random()));
+}
+
+function colorPalette(count, range, colorInterpol){
+    const colors = new Array(count);
+    for(let i=0; i<count; i++) colors[i] = colorInterpol((i/count)*(range.max-range.min)+range.min);
+    return colors;
+}
+
+const colors = shuffle(colorPalette(10, {min:0.2, max:0.9}, d3.interpolateMagma));
 
 // MUSIC DRAW ------------------------------------------------------------
 var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dayMusique);
