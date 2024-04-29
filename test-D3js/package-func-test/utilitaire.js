@@ -101,3 +101,45 @@ export function nullMatrix(n, m, ArrayNumber){
     for(let i=0; i < n; i++){ matrix[i] = (new ArrayNumber(m)).fill(0); }
     return matrix;
 }
+
+/**
+ * Allocate a new array, copy the element of a given array, and shuffle them
+ * @param {Array<any>} array which will be copied and shuffled : the given array isn't modified
+ * @returns a new array containing the same element than the previous one but ordered differently 
+ */
+export function copyShuffle(array){
+    let newarray = array.slice();
+    return  Array.from(newarray.sort((a,b) => 0.5 - Math.random()));
+}
+
+/**
+ * Shuffle an array on place
+ * @param {Array<any>} array which won't be copied, it is shuffled in place
+ * @returns the same array containing the same element but ordered differently 
+ */
+export function inplaceShuffle(array){
+    return  Array.from(array.sort((a,b) => 0.5 - Math.random()));
+}
+
+/**
+ * 
+ */
+export function closestProduct(num) {
+    let closestPair = [1, num];
+    let minDiff = Math.abs(num - 1);
+    let sqrtNum = Math.sqrt(num);
+    
+    for (let i = 2; i <= sqrtNum; i++) {
+        if (num % i == 0) {
+            let factor = num / i;
+            let newDiff = Math.abs(i - factor);
+
+            if (newDiff < minDiff) {
+                minDiff = newDiff;
+                closestPair = [i, factor];
+            }
+        }
+    }
+
+    return closestPair;
+}

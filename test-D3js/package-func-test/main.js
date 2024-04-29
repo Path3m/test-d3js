@@ -6,6 +6,7 @@ import * as jeu from "./data.js";
 
 import { Streamgraph } from "./Streamgraph.js";
 import { ImportanceHeatMap } from "./ImportanceHeatMap.js";
+import { ColorPalette } from "./ColorPalette.js";
 
 
 var site = "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv";
@@ -19,22 +20,16 @@ console.log("Testing");
 function maxInverse(x,y,z){ return Math.max(x, 1/y, 1/z); }
 function sumInverse(x,y,z){ return x + 1/y + 1/z; }
 
-function shuffle(array){
-    let newarray = array.slice();
-    return  Array.from(newarray.sort((a,b) => 0.5 - Math.random()));
-}
+let palette = new ColorPalette(d3.interpolateSpectral);
+palette.draw("color-palette", palette.palette, []);
 
-function colorPalette(count, range, colorInterpol){
-    const colors = new Array(count);
-    for(let i=0; i<count; i++) colors[i] = colorInterpol((i/count)*(range.max-range.min)+range.min);
-    return colors;
-}
-
-const colors = shuffle(colorPalette(10, {min:0.2, max:0.9}, d3.interpolateMagma));
+let cm = palette.colorRange(4);
+let cn = palette.colorRange(8);
 
 // MUSIC DRAW ------------------------------------------------------------
 var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dayMusique);
-graphDayMusique.draw(colors);
+palette.draw("color-music", cm, graphDayMusique.data.columns.slice(1));
+graphDayMusique.draw(cm);
 
 var hmMusicMaxInv = new ImportanceHeatMap(
     graphDayMusique, 
@@ -52,7 +47,8 @@ hmMusicSumInv.draw();
 
 // US NAMES DRAW ---------------------------------------------------------
 var graphUsaNames = new Streamgraph("#streamgraph2", jeu.usaNames);
-graphUsaNames.draw(colors);
+palette.draw("color-names", cn, graphUsaNames.data.columns.slice(1));
+graphUsaNames.draw(cn);
 
 var hmNamesMaxInv = new ImportanceHeatMap(
     graphUsaNames, 
@@ -69,4 +65,10 @@ var hmNamesSumInv = new ImportanceHeatMap(
 hmNamesSumInv.draw();
 
 //-----------------------------------------------------------------------
+console.log(graphDayMusique.computeGlobalImportance(Math.max));
+console.log(graphDayMusique.computeImportanceMatrix(Math.max));
+
+console.log(graphUsaNames.computeGlobalImportance(Math.max));
+console.log(graphUsaNames.computeImportanceMatrix(Math.max));
+
 console.log("fin de programme");

@@ -7,14 +7,24 @@
 
     <!-- to draw the streamgraph -->
     <script src="https://d3js.org/d3.v6.js"></script>
-    <!-- to print heatmap for importance matrix -->
+
+    <!-- to print heatmap -->
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-heatmap.min.js"></script>
+
+    <!-- to compute distance between colors -->
+    <script src="https://cdn.jsdelivr.net/npm/culori"></script>
+
     <!-- my main module and code -->
     <script type="module" src="main.js"></script>
 </head>
 
 <body>
+    <div class="heatmap-container" id="color-palette"></div>
+    <div class="heatmap-container" id="color-music"></div>
+    <div class="heatmap-container" id="color-names"></div>
+    
+
     <!-- Create a div where the graph will take place -->
     <div id="streamgraph1"></div>
     <div class="heatmap-container" id="heatmapMusic-1"></div>

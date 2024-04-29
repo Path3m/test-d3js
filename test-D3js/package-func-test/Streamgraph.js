@@ -114,6 +114,66 @@ export class Streamgraph {
           );
     }
 
+    computeElementaryImportance(func){
+      let keys = util.getKeys(this.data[0]).slice(1);
+      let hauteur = this.data;
+
+      /* soit |keys| le nombre de catégories on a donc : 
+      |keys|*(|keys|-1) / 2 : nombre de tableaux d'importance élémentaire à remplir 
+      chaque tableau est de taille 'f' avec 'f' le nombre total d'instant échantilloné dans le streamgraph*/
+      let line = keys.length * (keys.length-1) / 2;
+      let column = hauteur.length;
+
+      let impElem = new Map();
+      for(let i=0; i<keys.length; i++){
+        for(let j=i+1; j<keys.length; j++){
+            impElem.set(keys[i]+keys[j], new Float32Array(column).fill(0));
+        }
+      }
+
+      console.log(impElem);
+
+      for(let t=0; t<hauteur.length; t++){ //pour chaque instant des données
+        var categ = 0;
+        var voisin = 1;
+
+        while (categ < keys.length && voisin < keys.length){
+          //besoin de de contratste ssi la hauteur des deux catégories n'est pas nulle, et les catégories sont différentes
+          if      (categ == voisin || hauteur[t][keys[voisin]] == 0){ voisin++;}
+          else if (hauteur[t][keys[categ]] == 0)                    { categ++; }
+
+          else{ //sinon, il y a besoin de contraste entre les catégories
+            var hcateg  = hauteur[t][keys[categ]];
+            var hvoisin = hauteur[t][keys[voisin]];
+
+            console.log("Cat = ",keys[categ],"|vois = ",keys[voisin]);
+
+            impElem.get(keys[categ]+keys[voisin])[t] = func(hcateg, hvoisin);
+            categ++; voisin++;
+          }
+
+          console.log(impElem);
+        }
+      }
+
+      return impElem;
+    }
+
+    computeGlobalImportance(func){
+      let elementaire = this.computeElementaryImportance(func);
+
+      let keys = util.getKeys(this.data[0]).slice(1);
+      let importance = util.nullMatrix(keys.length, keys.length, Float32Array);
+
+      for(let categorie=0; categorie<keys.length; categorie++){
+        for(let voisin=categorie+1; voisin<keys.length; voisin++){
+          importance[categorie][voisin] = Math.max(...elementaire.get(keys[categorie]+keys[voisin]));
+          importance[voisin][categorie] = importance[categorie][voisin];
+        }
+      }
+      return importance;
+    }
+
     //---------------------------------------------------------------
     /**
      * GIVEN THE D3 REPRESNETATION OF A STEAMGRAPH
