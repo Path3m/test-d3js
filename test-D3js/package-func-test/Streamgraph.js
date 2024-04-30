@@ -2,6 +2,11 @@ import * as util from "./utilitaire.js";
 
 export class Streamgraph {
 
+    /**
+     * 
+     * @param {string} divID 
+     * @param {string | any} data 
+     */
     constructor(divID, data){
         // set the dimensions and margins of the graph
         this.margin = {top: 20, right: 30, bottom: 30, left: 60};
@@ -14,6 +19,14 @@ export class Streamgraph {
 
         this.svg = this.initSVG(divID);
         this.divID = divID;
+    }
+
+    /**
+     * 
+     * @returns the streamchart categories
+     */
+    getCategories(){
+      return this.data.columns.slice(1);
     }
 
     //-------------------------------------------------------------------
@@ -40,31 +53,42 @@ export class Streamgraph {
      * @param {*} scaleX 
      * @returns 
      */
-    createAxeX(scaleX){
-        return d3.scaleLinear()
+    addAbscissa(scaleX){
+        let x = d3.scaleLinear()
           .domain(d3.extent(this.data, function(d) { return d[scaleX]; }))
           .range([ 0, this.width ]);
+
+        this.svg.append("g")
+          .attr("transform", "translate(0," + this.height + ")")
+          .call(d3.axisBottom(x).ticks(20));
+        
+        return x;
     }
 
     //-------------------------------------------------------------------
     /**
      * Create the y axis to append to the svg object
-     * @param {*} categorieKey 
+     * @param {*} categories 
      * @returns 
      */
-    createAxeY(categorieKey){
-        let Ywidth = d3.extent(this.data, function(d) {
-          let sum = 0;
-          categorieKey.forEach(function(current){ sum += parseInt(d[current]); });
-          return sum; 
-        });
-        
-        let maxWidth = Math.max(...Ywidth);
-        let rangeY = [-(maxWidth/2), (maxWidth/2)];
-      
-        return d3.scaleLinear()
-          .domain(rangeY)
-          .range([ this.height, 0 ]);
+    addOrdinate(categories){
+      let Ywidth = d3.extent(this.data, function(d) {
+        let sum = 0;
+        categories.forEach(function(current){ sum += parseInt(d[current]); });
+        return sum; 
+      });
+
+      let maxWidth = Math.max(...Ywidth);
+      let rangeY = [-(maxWidth/2), (maxWidth/2)];
+    
+      let y = d3.scaleLinear()
+        .domain(rangeY)
+        .range([this.height, 0]);
+
+      this.svg.append("g")
+        .call(d3.axisLeft(y));
+
+      return y;
     }
 
     //-------------------------------------------------------------------
@@ -73,32 +97,30 @@ export class Streamgraph {
      * @param {*} colors
      */
     draw(colors) {
-
-      // List of groups = header of the csv files
+      // List of categories = header of the csv files
       var keys = this.data.columns.slice(1);
       var Xscale = (this.data.columns)[0]; //scale of the x axe
     
-      // Add X axis
-      var x = this.createAxeX(Xscale);
-      this.svg.append("g")
-        .attr("transform", "translate(0," + this.height + ")")
-        .call(d3.axisBottom(x).ticks(5));
-    
-      // Add Y axis
-      var y = this.createAxeY(keys);
-      this.svg.append("g")
-        .call(d3.axisLeft(y));
+      // Add X and Y axis
+      var x = this.addAbscissa(Xscale);
+      var y = this.addOrdinate(keys);
     
       // color palette
       var color = d3.scaleOrdinal()
         .domain(keys)
         .range(colors);
     
-      //stack the data?
+      //stack the data
       var stackedData = d3.stack()
         .offset(d3.stackOffsetSilhouette)
         .keys(keys)
         (this.data);
+
+      var area = d3.area()
+        .x(function(d, i) { return x(d.data[Xscale]); })
+        .y0(function(d) { return y(d[0]); })
+        .y1(function(d) { return y(d[1]); })
+        .curve(d3.curveMonotoneX);
     
       // Show the areas
       this.svg
@@ -107,13 +129,16 @@ export class Streamgraph {
         .enter()
         .append("path")
           .style("fill", function(d) { return color(d.key); })
-          .attr("d", d3.area()
-            .x(function(d, i) { return x(d.data[Xscale]); })
-            .y0(function(d) { return y(d[0]); })
-            .y1(function(d) { return y(d[1]); })
-          );
+          .attr("d", area);
     }
 
+    //-----------------------------------------------------
+    /**
+     * Compute and store for each pair of categories the elementary importance
+     * at each instant of the streamgraph
+     * @param {*} func 
+     * @returns a map containing the table of elementary importance between two categories
+     */
     computeElementaryImportance(func){
       let keys = util.getKeys(this.data[0]).slice(1);
       let hauteur = this.data;
@@ -121,53 +146,51 @@ export class Streamgraph {
       /* soit |keys| le nombre de catégories on a donc : 
       |keys|*(|keys|-1) / 2 : nombre de tableaux d'importance élémentaire à remplir 
       chaque tableau est de taille 'f' avec 'f' le nombre total d'instant échantilloné dans le streamgraph*/
-      let line = keys.length * (keys.length-1) / 2;
-      let column = hauteur.length;
-
       let impElem = new Map();
       for(let i=0; i<keys.length; i++){
         for(let j=i+1; j<keys.length; j++){
-            impElem.set(keys[i]+keys[j], new Float32Array(column).fill(0));
+            impElem.set(keys[i]+keys[j], new Float32Array(hauteur.length).fill(0));
         }
       }
 
-      console.log(impElem);
-
       for(let t=0; t<hauteur.length; t++){ //pour chaque instant des données
-        var categ = 0;
+        var categorie= 0;
         var voisin = 1;
 
-        while (categ < keys.length && voisin < keys.length){
-          //besoin de de contratste ssi la hauteur des deux catégories n'est pas nulle, et les catégories sont différentes
-          if      (categ == voisin || hauteur[t][keys[voisin]] == 0){ voisin++;}
-          else if (hauteur[t][keys[categ]] == 0)                    { categ++; }
+        while (categorie< keys.length && voisin < keys.length){
+          //besoin de de contraste ssi la hauteur des deux catégories n'est pas nulle, et les catégories sont différentes
+          if      (categorie== voisin || hauteur[t][keys[voisin]] == 0){ voisin++;}
+          else if (hauteur[t][keys[categorie]] == 0)                   { categorie++; }
 
           else{ //sinon, il y a besoin de contraste entre les catégories
-            var hcateg  = hauteur[t][keys[categ]];
+            var hcategorie = hauteur[t][keys[categorie]];
             var hvoisin = hauteur[t][keys[voisin]];
 
-            console.log("Cat = ",keys[categ],"|vois = ",keys[voisin]);
-
-            impElem.get(keys[categ]+keys[voisin])[t] = func(hcateg, hvoisin);
-            categ++; voisin++;
+            impElem.get(keys[categorie]+keys[voisin])[t] = func(hcategorie, hvoisin);
+            categorie++; voisin++;
           }
-
-          console.log(impElem);
         }
       }
 
       return impElem;
     }
 
-    computeGlobalImportance(func){
-      let elementaire = this.computeElementaryImportance(func);
+    /**
+     * Given the d3 representation of a streamgraph, and the elementary 
+     * importance, compute the matrix of global importance
+     * @param {*} funcGlobal function to compute the global importance from an array of elementary importance
+     * @param {*} funcElem function to compute each elementary importance
+     * @returns the matrix of global importance between categories
+     */
+    computeGlobalImportance(funcGlobal, funcElem){
+      let elementaire = this.computeElementaryImportance(funcElem);
 
       let keys = util.getKeys(this.data[0]).slice(1);
       let importance = util.nullMatrix(keys.length, keys.length, Float32Array);
 
       for(let categorie=0; categorie<keys.length; categorie++){
         for(let voisin=categorie+1; voisin<keys.length; voisin++){
-          importance[categorie][voisin] = Math.max(...elementaire.get(keys[categorie]+keys[voisin]));
+          importance[categorie][voisin] = funcGlobal(elementaire.get(keys[categorie]+keys[voisin]));
           importance[voisin][categorie] = importance[categorie][voisin];
         }
       }
@@ -180,7 +203,7 @@ export class Streamgraph {
      *  - compute the importance matrix of the streamgraph
      * @returns the importance matrix of a streamgraph
      */
-    computeImportanceMatrix(func){
+    computeImportanceMatrixInPlace(func){
 
       //TODO : use library to determine which representation is in used and compute the matrix accordingly
 
@@ -197,10 +220,10 @@ export class Streamgraph {
           //besoin de de contratste ssi la hauteur des deux catégories n'est pas nulle, et les catégories sont différentes
 
           if      (categorie == voisin || hauteur[t][keys[voisin]] == 0){ voisin++;    }
-          else if (hauteur[t][keys[categorie]] == 0)                    { categorie++; }
+          else if (hauteur[t][keys[categorieorie]] == 0)                    { categorie++; }
 
           else{ //sinon, il y a besoin de contraste entre les catégories
-            var importancePrecedente = importance[categorie][voisin];
+            var importancePrecedente = importance[categorieorie][voisin];
             var hauteurCategorie     = hauteur[t][keys[categorie]];
             var hauteurVoisin        = hauteur[t][keys[voisin]];
 
@@ -214,28 +237,5 @@ export class Streamgraph {
       }
 
       return importance;
-    }
-
-    //---------------------------------------------------------------------
-    /**
-     * @return the data needed to print the importance matrix as a HeatMap
-     */
-    heatMapData(func){
-      var importance = this.computeImportanceMatrix(func);
-      var categories = util.getKeys(this.data[0]).slice(1);
-
-      var dataHeatMap = new Array(importance.length**2);
-
-      for(let i=0; i < importance.length; i++){
-        for(let j=0; j < importance.length; j++){
-          dataHeatMap[i * importance.length + j] = { 
-            x: categories[i], 
-            y: categories[j], 
-            heat: importance[i][j]
-          };
-        }
-      }
-
-      return dataHeatMap;
     }
 }

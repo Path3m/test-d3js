@@ -1,3 +1,4 @@
+import { HeatMap } from "./HeatMap.js";
 import * as util from "./utilitaire.js";
 
 //NB : to use in accordance with a factory class ?
@@ -57,7 +58,7 @@ export class ColorPalette{
      * @param {*} title 
      * @param {*} container 
      */
-    draw(container, colors, categories){
+    static draw(container, colors, categories){
         let size = util.closestProduct(colors.length);
         let line = size[0]; let column = size[1];
 
@@ -86,9 +87,35 @@ export class ColorPalette{
         heatmap.draw();
     }
 
-    computeDistanceMatrix(rangeOfColor){
+    /**
+     * Compute the distance between two color in the CIELAB color space
+     * given the ciede2000 formula
+     * @param {*} color1 
+     * @param {*} color2 
+     * @returns 
+     */
+    static distance(color1, color2){
+        let lab     = culori.converter('lab');
+        let formula = culori.differenceCiede2000(1,1,1);
+        return formula(lab(color1),lab(color2));
+    }
+
+    /**
+     * Compute the color distance matrix according to the ciede2000 formula
+     * on a given color range
+     * @param {*} rangeOfColor 
+     * @returns 
+     */
+    static computeDistanceMatrix(rangeOfColor){
         let distance = util.nullMatrix(rangeOfColor.length, rangeOfColor.length, Float32Array);
 
+        for(let i=0; i<rangeOfColor.length; i++){
+            for(let j=i+1; j<rangeOfColor.length; j++){
+                distance[i][j] = ColorPalette.distance(rangeOfColor[i], rangeOfColor[j]);
+                distance[j][i] = distance[i][j];
+            }
+        }
 
+        return distance;
     }
 }

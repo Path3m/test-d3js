@@ -8,7 +8,7 @@
     <!-- to draw the streamgraph -->
     <script src="https://d3js.org/d3.v6.js"></script>
 
-    <!-- to print heatmap -->
+    <!-- to print heatmap : note that it can be done with d3, to see later on -->
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-heatmap.min.js"></script>
 
@@ -21,18 +21,24 @@
 
 <body>
     <div class="heatmap-container" id="color-palette"></div>
-    <div class="heatmap-container" id="color-music"></div>
-    <div class="heatmap-container" id="color-names"></div>
     
 
-    <!-- Create a div where the graph will take place -->
+    <!-- Part music -->
     <div id="streamgraph1"></div>
+    <div class="heatmap-container" id="color-music"></div>
+
     <div class="heatmap-container" id="heatmapMusic-1"></div>
     <div class="heatmap-container" id="heatmapMusic-2"></div>
 
+    <!-- Part names in usa -->
     <div id="streamgraph2"></div>
+    <div class="heatmap-container" id="color-names"></div>
+
     <div class="heatmap-container" id="heatmapNames-1"></div>
     <div class="heatmap-container" id="heatmapNames-2"></div>
+
+    <!-- color dist -->
+    <div class="heatmap-container" id="color-dist"></div>
 </body>
 
 </html>

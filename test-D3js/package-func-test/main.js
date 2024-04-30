@@ -2,10 +2,11 @@
 /* import * as d3 from "d3"; */
 
 import * as util from "./utilitaire.js";
+import * as method from "./computationMethod.js";
 import * as jeu from "./data.js";
 
 import { Streamgraph } from "./Streamgraph.js";
-import { ImportanceHeatMap } from "./ImportanceHeatMap.js";
+import { HeatMap } from "./HeatMap.js";
 import { ColorPalette } from "./ColorPalette.js";
 
 
@@ -17,58 +18,35 @@ var othersite = "http://localhost:8000/package-func-test/datatest.csv"
 
 console.log("Testing");
 
-function maxInverse(x,y,z){ return Math.max(x, 1/y, 1/z); }
-function sumInverse(x,y,z){ return x + 1/y + 1/z; }
-
-let palette = new ColorPalette(d3.interpolateSpectral);
-palette.draw("color-palette", palette.palette, []);
-
-let cm = palette.colorRange(4);
-let cn = palette.colorRange(8);
+let palette = new ColorPalette(d3.interpolateMagma);
+ColorPalette.draw("color-palette", palette.palette, []);
 
 // MUSIC DRAW ------------------------------------------------------------
-var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dayMusique);
-palette.draw("color-music", cm, graphDayMusique.data.columns.slice(1));
+var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dmFilterAlternative);
+var cm = palette.colorRange(graphDayMusique.data.columns.length - 1);
+
+ColorPalette.draw("color-music", cm, graphDayMusique.data.columns.slice(1));
 graphDayMusique.draw(cm);
 
-var hmMusicMaxInv = new ImportanceHeatMap(
-    graphDayMusique, 
-    maxInverse, 
-    "Catégorie Musicale - fonction maxInverse", 
-    "heatmapMusic-1");
-hmMusicMaxInv.draw();
-
-var hmMusicSumInv = new ImportanceHeatMap(
-    graphDayMusique, 
-    sumInverse,
-    "Catégorie Musicale - fonction sumInverse",
-    "heatmapMusic-2");
-hmMusicSumInv.draw();
+let hmMusic1 = HeatMap.importanceHeatMap("heatmapMusic-1", graphDayMusique, method.impMaxInverse);
+let hmMusic2 = HeatMap.importanceHeatMap("heatmapMusic-2", graphDayMusique, method.impAverage);
+hmMusic1.draw();
+hmMusic2.draw();
 
 // US NAMES DRAW ---------------------------------------------------------
 var graphUsaNames = new Streamgraph("#streamgraph2", jeu.usaNames);
-palette.draw("color-names", cn, graphUsaNames.data.columns.slice(1));
+var cn = palette.colorRange(graphUsaNames.data.columns.length - 1);
+
+ColorPalette.draw("color-names", cn, graphUsaNames.data.columns.slice(1));
 graphUsaNames.draw(cn);
 
-var hmNamesMaxInv = new ImportanceHeatMap(
-    graphUsaNames, 
-    maxInverse, 
-    "Noms USA - fonction maxInverse", 
-    "heatmapNames-1");
-hmNamesMaxInv.draw();
-
-var hmNamesSumInv = new ImportanceHeatMap(
-    graphUsaNames, 
-    sumInverse, 
-    "Noms USA - fonction sumInverse", 
-    "heatmapNames-2");
-hmNamesSumInv.draw();
+let hmNames1 = HeatMap.importanceHeatMap("heatmapNames-1", graphUsaNames, method.impMaxInverse);
+let hmNames2 = HeatMap.importanceHeatMap("heatmapNames-2", graphUsaNames, method.impAverage);
+hmNames1.draw();
+hmNames2.draw();
 
 //-----------------------------------------------------------------------
-console.log(graphDayMusique.computeGlobalImportance(Math.max));
-console.log(graphDayMusique.computeImportanceMatrix(Math.max));
-
-console.log(graphUsaNames.computeGlobalImportance(Math.max));
-console.log(graphUsaNames.computeImportanceMatrix(Math.max));
+let hmColor = HeatMap.colorDistanceHeatMap("color-dist", cn);
+hmColor.draw();
 
 console.log("fin de programme");
