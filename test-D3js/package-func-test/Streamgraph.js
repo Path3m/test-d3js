@@ -11,7 +11,7 @@ export class Streamgraph {
         // set the dimensions and margins of the graph
         this.margin = {top: 20, right: 30, bottom: 30, left: 60};
         this.width = 1200 - this.margin.left - this.margin.right;
-        this.height = 700 - this.margin.top - this.margin.bottom;
+        this.height = this.width/3 - this.margin.top - this.margin.bottom;
 
         this.data = (data instanceof String || typeof data === 'string') ? 
           d3.csvParse(data) : 
