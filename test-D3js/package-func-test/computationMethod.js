@@ -44,4 +44,3 @@ export const impAverage = [
 
 export function accInverse(acc,y,z){ return Math.max(acc, 1/y, 1/z); }
 export function sumInverse(acc,y,z){ return acc + 1/y + 1/z; }
-

@@ -122,7 +122,11 @@ export function inplaceShuffle(array){
 }
 
 /**
- * 
+ * Take a number "n" and return a pair of number {x, y} so that
+ * - |x-y| is minimal
+ * - x*y = n
+ * @param {*} num 
+ * @returns 
  */
 export function closestProduct(num) {
     let closestPair = [1, num];
@@ -142,4 +146,13 @@ export function closestProduct(num) {
     }
 
     return closestPair;
+}
+
+/**
+ * 
+ * @param {*} x 
+ * @returns true if x is an integer, false otherwise
+ */
+export function isInt(x){
+    return typeof x === 'number' && Math.floor(x) === x;
 }

@@ -2,17 +2,16 @@ import { ColorPalette } from "./ColorPalette.js";
 import {Streamgraph} from "./Streamgraph.js";
 
 export class HeatMap{
-    
     /**
      * Constructor
      * @param {*} graph the data vizualisation from which we get the importance matrix
-     * @param {function} func the function over which the importance will be computed
+     * @param {*} func the function over which the importance will be computed
      * @param {*} title 
      * @param {*} container an html container to display on the page
      */
     constructor(title, container, dataMatrix, dataCategories){
 
-        this.colorPalette = new ColorPalette(d3.interpolateReds);
+        this.palette = ColorPalette.largeGraphPalette(d3.interpolateReds);
         this.data = this.heatMapData(dataMatrix, dataCategories);
 
         this.heatmap = anychart.heatMap(this.data);
@@ -21,10 +20,11 @@ export class HeatMap{
     }
 
     /**
-     * 
-     * @param {*} matrix 
-     * @param {*} dataCategories 
-     * @returns 
+     * Build the heatmap data from a symmetric matrix and a set of categories,
+     * where matrix[i,j] is the heat for the pair of categorie {i,j}
+     * @param {Array<Array<number>>} matrix containing the heat values
+     * @param {Array<any>} dataCategories the different catgeories 
+     * @returns correct set of data to build the heatmap
      */
     heatMapData(matrix, dataCategories){
         let line = matrix.length;
@@ -73,10 +73,10 @@ export class HeatMap{
      * @param {*} container 
      * @param {*} colorRange 
      */
-    static colorDistanceHeatMap(container, colorRange){
-        let distance = ColorPalette.computeDistanceMatrix(colorRange);
+    static colorDistanceHeatMap(container, colorPalette){
+        let distance = colorPalette.computeDistanceMatrix();
         return new HeatMap(
-            "Distance Couleur", container, distance, colorRange 
+            "Distance Couleur", container, distance, colorPalette.colors
         )
     }
 
@@ -114,7 +114,7 @@ export class HeatMap{
      * Draw the heatmap
      */
     draw(){
-        this.setColorScale(this.colorPalette.palette);
+        this.setColorScale(this.palette.colors);
         this.heatmap.draw();
     }
 }
