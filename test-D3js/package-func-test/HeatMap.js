@@ -11,7 +11,7 @@ export class HeatMap{
      */
     constructor(title, container, dataMatrix, dataCategories){
 
-        this.palette = ColorPalette.largeGraphPalette(d3.interpolateReds);
+        this.palette = ColorPalette.largeGraphPalette( ColorPalette.interpolateBuRd );
         this.data = this.heatMapData(dataMatrix, dataCategories);
 
         this.heatmap = anychart.heatMap(this.data);
