@@ -4,6 +4,10 @@ import * as util from "./utilitaire.js";
 //NB : to use in accordance with a factory class ?
 
 export class ColorPalette{
+
+    static interpolateBuRd = x => d3.interpolateRdBu(d3.interpolateNumber(0.65, 0)(x));
+    static interpolateBuYlRd = x => d3.interpolateRdYlBu(d3.interpolateNumber(0.65, 0)(x));
+
     /**
      * 
      * @param {Array<any>} colors
