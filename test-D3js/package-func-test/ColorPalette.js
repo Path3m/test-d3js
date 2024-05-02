@@ -4,19 +4,13 @@ import * as util from "./utilitaire.js";
 //NB : to use in accordance with a factory class ?
 
 export class ColorPalette{
-
     /**
      * 
-     * @param {*} colorInterpolate 
+     * @param {Array<any>} colors
      */
-    constructor(colorInterpolate){
-        this.paletteBuilder = colorInterpolate;
-
-        this.palette = this.colorPalette(
-            100, 
-            {min: 0.1, max: 0.9},   
-            this.paletteBuilder
-        );
+    constructor(colors, builder){
+        this.builder = builder;
+        this.colors = colors;
     }
 
     /**
@@ -24,33 +18,58 @@ export class ColorPalette{
      * @param {*} count 
      * @param {*} range 
      * @param {*} colorInterpol 
-     * @returns an array of colors from an continuous color scale
+     * @returns an array of colors from a continuous color scale
      */
-    colorPalette(count, range, colorInterpol){
+    static buildPalette(count, range, colorInterpol){
         const colors = new Array(count);
         for(let i=0; i<count; i++) colors[i] = colorInterpol((i/count)*(range.max-range.min)+range.min);
-        return colors;
+        return new ColorPalette(colors, colorInterpol);
+    }
+
+    /**
+     * 
+     * @param {*} colorInterpol 
+     * @returns a ColorPalette of a hundred colors
+     */
+    static largeGraphPalette(colorInterpol){
+        return this.buildPalette(100, {min:0.1, max:0.9}, colorInterpol);
     }
 
     /**
      * 
      * @param {*} count 
-     * @returns an array of color got randomly from the palette
+     * @returns an array of color evenly spread from the palette
      */
-    colorRange(count){
-        if(count > this.palette.length) throw new Error("More color asked than there is on the palette.");
-
-        let colors = new Array(count);
-        let index = new Array(count);
-
-        for(let i=0;i<count;i++) index[i] = i * Math.floor(this.palette.length / count);
-        util.inplaceShuffle(index);
-
-        for(let i = 0; i < count; i++){
-            colors[i] = this.palette[index[i]];
+    subPalette(percentage){
+        let count = this.colors.length * percentage;
+        if(typeof percentage === 'number'){
+            if(util.isInt(percentage) && percentage > 0 && percentage <= 100){
+                count = Math.floor(count / 100);
+            }else if(percentage > 0 && percentage <= 1){
+                count = Math.floor(count);
+            }
+        }else{
+            throw new Error("No good percentage where given for subpalette creation.");
         }
 
-        return colors;
+        return this.paletteSample(count);
+    }
+
+    /**
+     * Return a new palette with the exact count of color given
+     * @param {*} count 
+     * @returns 
+     */
+    paletteSample(count){
+        let colors = new Array(count);
+
+        for(let i = 0; i < count; i++){
+            colors[i] = this.colors[
+                i * Math.floor(this.colors.length / count)
+            ];
+        }
+
+        return new ColorPalette(colors, this.builder);
     }
 
     /**
@@ -58,30 +77,23 @@ export class ColorPalette{
      * @param {*} title 
      * @param {*} container 
      */
-    static draw(container, colors, categories){
-        let size = util.closestProduct(colors.length);
+    draw(container, categories){
+        let size = util.closestProduct(this.colors.length);
         let line = size[0]; let column = size[1];
 
         let data = new Array(line * column);
-        let colorRange = new Array(line * column);
 
         for(let i=0;i<line;i++){ 
             for(let j=0;j<column;j++){
                 let k = i*column+j;
                 let categorie = (categories[k] == undefined) ? k : categories[k];
-
-                data[k] = { x:""+j, y:""+i, heat:""+k, custom_field:  categorie};
-                colorRange[k] = { from: data[k].heat, to: data[k].heat};
+                data[k] = {x:""+j, y:""+i, heat:""+k, custom_field:  categorie, fill: this.colors[k]};
             }
         }
 
         let heatmap = anychart.heatMap(data)
-                .container(container)
-                .title(container)
-            .colorScale( anychart.scales.ordinalColor()
-                .ranges(colorRange)
-                .colors(colors)
-            );
+            .container(container)
+            .title(container);
 
         heatmap.tooltip().format("{%custom_field}");
         heatmap.draw();
@@ -106,12 +118,12 @@ export class ColorPalette{
      * @param {*} rangeOfColor 
      * @returns 
      */
-    static computeDistanceMatrix(rangeOfColor){
-        let distance = util.nullMatrix(rangeOfColor.length, rangeOfColor.length, Float32Array);
+    computeDistanceMatrix(){
+        let distance = util.nullMatrix(this.colors.length, this.colors.length, Float32Array);
 
-        for(let i=0; i<rangeOfColor.length; i++){
-            for(let j=i+1; j<rangeOfColor.length; j++){
-                distance[i][j] = ColorPalette.distance(rangeOfColor[i], rangeOfColor[j]);
+        for(let i=0; i<this.colors.length; i++){
+            for(let j=i+1; j<this.colors.length; j++){
+                distance[i][j] = ColorPalette.distance(this.colors[i], this.colors[j]);
                 distance[j][i] = distance[i][j];
             }
         }
