@@ -73,10 +73,11 @@ export class HeatMap{
      * @param {*} container 
      * @param {*} colorRange 
      */
-    static colorDistanceHeatMap(container, colorPalette){
+    static colorDistanceHeatMap(container, colorPalette, categories){
         let distance = colorPalette.computeDistanceMatrix();
         return new HeatMap(
-            "Distance Couleur", container, distance, colorPalette.colors
+            "Distance Couleur", container, distance, 
+            (categories == undefined)? colorPalette.colors : categories
         )
     }
 
