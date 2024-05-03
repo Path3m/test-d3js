@@ -18,12 +18,12 @@ var othersite = "http://localhost:8000/package-func-test/datatest.csv"
 
 console.log("Testing");
 
-let palette = ColorPalette.largeGraphPalette(d3.interpolateCool);
+let palette = ColorPalette.largeGraphPalette(d3.interpolateViridis);
 /* palette.draw("color-palette", []);
 HeatMap.colorDistanceHeatMap("color-dist-global-palette", palette).draw(); */
 
 // MUSIC DRAW ------------------------------------------------------------
-let graphDayMusique = new Streamgraph("#streamgraph1", jeu.binary);
+let graphDayMusique = new Streamgraph("#streamgraph1", jeu.dmFilterAlternative);
 let music           = graphDayMusique.getCategories();
 let colorMusic      = palette.paletteSample(graphDayMusique.getCategories().length).shuffle();
 
