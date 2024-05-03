@@ -19,33 +19,40 @@ var othersite = "http://localhost:8000/package-func-test/datatest.csv"
 console.log("Testing");
 
 let palette = ColorPalette.largeGraphPalette(d3.interpolateCool);
-palette.draw("color-palette", []);
+/* palette.draw("color-palette", []);
+HeatMap.colorDistanceHeatMap("color-dist-global-palette", palette).draw(); */
 
 // MUSIC DRAW ------------------------------------------------------------
-var graphDayMusique = new Streamgraph("#streamgraph1", jeu.dmFilterAlternative);
-var cm = palette.paletteSample(graphDayMusique.getCategories().length);
-util.inplaceShuffle(cm.colors);
+let graphDayMusique = new Streamgraph("#streamgraph1", jeu.binary);
+let music           = graphDayMusique.getCategories();
+let colorMusic      = palette.paletteSample(graphDayMusique.getCategories().length).shuffle();
 
-cm.draw("color-music", graphDayMusique.getCategories());
-graphDayMusique.draw(cm.colors);
+let CDMMusic = HeatMap.colorDistanceHeatMap("color-dist-music-palette", colorMusic, music);
+let IMMusic1 = HeatMap.importanceHeatMap("heatmapMusic-1", graphDayMusique, method.impMaxInverse);
+let IMMusic2 = HeatMap.importanceHeatMap("heatmapMusic-2", graphDayMusique, method.impAverage);
 
-let hmMusic1 = HeatMap.importanceHeatMap("heatmapMusic-1", graphDayMusique, method.impMaxInverse);
-let hmMusic2 = HeatMap.importanceHeatMap("heatmapMusic-2", graphDayMusique, method.impAverage);
-hmMusic1.draw();
-hmMusic2.draw();
+graphDayMusique.draw(colorMusic.colors);
+colorMusic.draw("color-music", music);
+
+CDMMusic.draw();
+IMMusic1.draw();
+IMMusic2.draw();
 
 // US NAMES DRAW ---------------------------------------------------------
-var graphUsaNames = new Streamgraph("#streamgraph2", jeu.usaNames);
-var cn = palette.paletteSample(graphUsaNames.getCategories().length);
-util.inplaceShuffle(cn.colors);
+let graphUsaNames = new Streamgraph("#streamgraph2", jeu.usaNames);
+let names         = graphUsaNames.getCategories();
+let colorNames    = palette.paletteSample(graphUsaNames.getCategories().length).shuffle();
 
-cn.draw("color-names", graphUsaNames.getCategories());
-graphUsaNames.draw(cn.colors);
+let CDMNames = HeatMap.colorDistanceHeatMap("color-dist-names-palette", colorNames, names);
+let IMNames1 = HeatMap.importanceHeatMap("heatmapNames-1", graphUsaNames, method.impMaxInverse);
+let IMNames2 = HeatMap.importanceHeatMap("heatmapNames-2", graphUsaNames, method.impAverage);
 
-let hmNames1 = HeatMap.importanceHeatMap("heatmapNames-1", graphUsaNames, method.impMaxInverse);
-let hmNames2 = HeatMap.importanceHeatMap("heatmapNames-2", graphUsaNames, method.impAverage);
-hmNames1.draw();
-hmNames2.draw();
+graphUsaNames.draw(colorNames.colors);
+colorNames.draw("color-names", names);
+
+CDMNames.draw();
+IMNames1.draw();
+IMNames2.draw();
 
 //-----------------------------------------------------------------------
 console.log("fin de programme");
