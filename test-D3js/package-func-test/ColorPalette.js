@@ -77,6 +77,15 @@ export class ColorPalette{
     }
 
     /**
+     * Shuffle the colors in the palette
+     * @return a reference to the color palette
+     */
+    shuffle(){
+        util.inplaceShuffle(this.colors);
+        return this;
+    }
+
+    /**
      * Draw the color palette using anychart heatmaps features
      * @param {*} title 
      * @param {*} container 
