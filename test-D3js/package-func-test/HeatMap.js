@@ -1,5 +1,6 @@
 import { ColorPalette } from "./ColorPalette.js";
 import {Streamgraph} from "./Streamgraph.js";
+import {name} from "./computationMethod.js";
 
 export class HeatMap{
     /**
@@ -64,7 +65,7 @@ export class HeatMap{
         let categories = graph.getCategories();
 
         return new HeatMap(
-            "Importance", container, importance, categories
+            "Importance : "+name(computeMethod), container, importance, categories
         );
     }
 
